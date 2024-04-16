@@ -1,4 +1,3 @@
-import json
 from datasets import load_dataset
 from tokenizers import (
     Tokenizer,
@@ -9,6 +8,7 @@ from tokenizers import (
     decoders,
     trainers,
 )
+import json
 
 def batch_iterator(file_path, batch_size=10000):
     with open(file_path, 'r', encoding='utf-8') as f:
