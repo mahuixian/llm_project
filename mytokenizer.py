@@ -1,4 +1,5 @@
 from datasets import load_dataset
+from datasets import DatasetDict
 from tokenizers import (
     Tokenizer,
     normalizers,
@@ -10,13 +11,24 @@ from tokenizers import (
 )
 import json
 
-def batch_iterator(file_path, batch_size=10000):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        infos = json.load(f)
-        for i in range(0, len(infos), batch_size):
-            items = [info['instruction'] + " " + info['input'] + " " + info['output'] for info in infos[i:i+batch_size]]
-            yield items
-            
+
+def dataloader(datapaths):
+    datasets = DatasetDict()
+    
+    for datapath in datapaths:
+        dataset = load_dataset('json', data_dir=datapath)
+        datasets = datasets.update(dataset)
+    
+    return datasets
+        
+
+
+def batch_iterator(datasets, batch_size=10000):
+    for i in range(0, len(datasets), batch_size):
+        items = [info['instruction'] + " " + info['input'] + " " + info['output'] for info in datasets[i:i+batch_size]]
+        yield items
+    
+
 
 def train_tokenizer(file_path):
     tokenizer = Tokenizer(models.BPE(unk_token="[UNK]"))
